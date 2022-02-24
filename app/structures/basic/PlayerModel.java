@@ -112,7 +112,7 @@ public class PlayerModel {
 				return false;
 			}
 		} else if(c instanceof SpellCard) {
-			return false;
+			return true;
 		}
 		
 		return false;

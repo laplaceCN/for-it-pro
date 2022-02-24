@@ -7,6 +7,7 @@ import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.Avatar;
 import structures.basic.Board;
+import structures.basic.Player;
 
 /**
  * Indicates that the user has clicked an object on the game canvas, in this case
@@ -26,6 +27,31 @@ public class EndTurnClicked implements EventProcessor{
 		BasicCommands.addPlayer1Notification(out, "EndTurnClicked!", 2);
 		gameState.getHumanModel().drawOneCard(out);
 		gameState.clearHumanMana(out);
+
+		gameState.recoverCardState();
+
+
+		//清楚暂存器状态
+		Player hModel = gameState.getHuman();
+		if(gameState.cardClickedAndWaiting) {
+			gameState.cardClickedAndWaiting = false;
+			int previousIndex = gameState.tempCardIndex;
+			//let the buffer rest
+			try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
+			gameState.getHumanModel().showAvailables(out, previousIndex, 0);
+			//let the buffer rest
+			try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
+			BasicCommands.drawCard(out, hModel.getCard(previousIndex-1), previousIndex, 0);
+			//gameState.tempCardIndex = -1;
+		}
+
+		gameState.aiMethod();
+
+		gameState.setHumanMana(out);
+
+
+
+
 	}
 	/**
 	 * //		原文：

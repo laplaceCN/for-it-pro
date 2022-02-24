@@ -5,7 +5,10 @@ public class Minion extends Unit{
 	public int id;
 	private int health;
 	private int attack;
-	
+
+
+
+
 	//setters
 	public void setHealth(int h) {
 		this.health = h;

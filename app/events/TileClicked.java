@@ -41,6 +41,30 @@ public class TileClicked implements EventProcessor{
 			//remove card from hand
 			if(flag == true) {gameState.getHumanModel().deleteHandCard(out, gameState.tempCardIndex);}
 		}
+
+		if(gameState.tileClickedAndWaiting == true){
+			//重置状态
+			gameState.tileClickedAndWaiting = false;
+			//显示攻击范围，在下面的方法的基础上需要改写
+			gameState.getHumanModel().showAvailables(out, gameState.tempCardIndex, 0);
+
+			//判断点击的对象是否超了范围
+			boolean flag = gameState.getHumanModel().useSelectedCard(out, gameState.tempCardIndex, tilex, tiley);
+
+			if(flag){
+				gameState.Attack();
+			}
+
+
+
+
+		}
+		if(gameState.tileClickedAndWaiting == false && gameState.cardClickedAndWaiting == true){
+
+
+
+
+		}
 		
 	}
 
