@@ -18,7 +18,7 @@ import structures.basic.Player;
  * }
  * 
  * @author Dr. Richard McCreadie
- *
+ * hello world
  */
 public class EndTurnClicked implements EventProcessor{
 
