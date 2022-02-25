@@ -26,6 +26,7 @@ public class CardClicked implements EventProcessor{
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 		
 		int handPosition = message.get("position").asInt();
+		
 		Player hModel = gameState.getHuman();
 		if(hModel.getCard(handPosition-1).getManacost() > gameState.getHuman().getMana()) {
 			if(gameState.cardClickedAndWaiting == true) {
@@ -42,6 +43,19 @@ public class CardClicked implements EventProcessor{
 			} else {
 				int previousIndex = gameState.tempCardIndex;
 				BasicCommands.drawCard(out, hModel.getCard(previousIndex-1), previousIndex, 0);
+				//turn off highlights
+//				for(int i = 0; i < 9; i++) {
+//					for(int j = 0; j < 5; j++) {
+//						if(gameState.getBoard().getTile(i, j).highlighted) {
+//							Tile t = gameState.getBoard().getTile(i, j);
+//							BasicCommands.drawTile(out, t, 0);
+//							try {Thread.sleep(20);} catch (InterruptedException e) {e.printStackTrace();}
+//							//t.highlighted = false;
+//						}
+//					}
+//				}
+//				try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
+				gameState.getHumanModel().highlightControl(out, 0);
 			}
 			gameState.tempCardIndex = handPosition;
 			//let the buffer rest

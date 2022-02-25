@@ -18,7 +18,7 @@ import structures.basic.Player;
  * }
  * 
  * @author Dr. Richard McCreadie
- * project
+ *
  */
 public class EndTurnClicked implements EventProcessor{
 
@@ -109,7 +109,5 @@ public class EndTurnClicked implements EventProcessor{
 	 *
 	 *
 	 */
-
-
 
 }

@@ -4,8 +4,6 @@ import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.basic.*;
 
-import java.util.ArrayList;
-
 /**
  * This class can be used to hold information about the on-going game.
  * Its created with the GameActor.
@@ -14,12 +12,10 @@ import java.util.ArrayList;
  *
  */
 public class GameState {
-
+	
 	//token indicating human or AI
 	private static boolean isHuman = false;
 	private static boolean isAI = true;
-	private static int idHuman = 20;
-	private static int idAI = 21;
 
 	//round number
 	public int numRound = 1;
@@ -28,7 +24,7 @@ public class GameState {
 	public boolean gameInitalised = false;	
 	public boolean cardClickedAndWaiting = false;
 	public boolean tileClickedAndWaiting = false;
-
+	
 	public boolean something = false;
 	
 	//temporary containers
@@ -43,9 +39,7 @@ public class GameState {
 	// the player models
 	private PlayerModel humanModel;
 	private PlayerModel aiModel;
-	// the avatars
-	private Avatar aHuman;
-	private Avatar aAI;
+	private BoardModel boardModel;
 	
 	public GameState() {
 		
@@ -59,24 +53,24 @@ public class GameState {
 		// Create players' playerModels
 		humanModel = new PlayerModel(human, board);
 		aiModel = new PlayerModel(ai, board);
-		
-		// Create avatars, link them to players and add them to board's list
-		// Unit id for avatarHuman = 20, avartarAI = 21
-		aHuman = (Avatar)utils.BasicObjectBuilders.loadUnit(utils.StaticConfFiles.humanAvatar, idHuman, Avatar.class);
-		aAI = (Avatar)utils.BasicObjectBuilders.loadUnit(utils.StaticConfFiles.aiAvatar, idAI, Avatar.class);
-		aHuman.setPlayer(human);
-		aAI.setPlayer(ai);
-		board.addUnit(aHuman);
-		board.addUnit(aAI);
+		boardModel = new BoardModel(human, ai, board);
 	}
 	
-	public void setManaAndCountRound() {
+	public void showStatisticsAndCountRound(ActorRef out) {
+		//set mana and count round number
 		human.setMana(numRound+1);
 		ai.setMana(numRound+1);
+		//show them
+		BasicCommands.setPlayer1Health(out, human);
+		BasicCommands.setPlayer2Health(out, ai);
+		BasicCommands.setPlayer1Mana(out, human);
+		BasicCommands.setPlayer2Mana(out, ai);
+		//let the buffer rest
+		try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
 		//and count round
 		numRound++;
 	}
-	
+
 	public void clearHumanMana(ActorRef out) {
 		human.setMana(0);
 		BasicCommands.setPlayer1Mana(out, human);
@@ -85,7 +79,8 @@ public class GameState {
 		human.setMana(numRound + 2);
 		BasicCommands.setPlayer1Mana(out, human);
 	}
-	
+
+
 	//getters
 	public Board getBoard() {
 		return board;
@@ -99,14 +94,6 @@ public class GameState {
 		return ai;
 	}
 	
-	public Avatar getHumanAvatar() {
-		return this.aHuman;
-	}
-	
-	public Avatar getAIAvatar() {
-		return this.aAI;
-	}
-	
 	public PlayerModel getHumanModel() {
 		return humanModel;
 	}
@@ -114,12 +101,14 @@ public class GameState {
 	public PlayerModel getAIModel() {
 		return aiModel;
 	}
-
-
+	
+	public BoardModel getBoardModel() {
+		return boardModel;
+	}
 	//这个方法是为了重置卡片的攻击次数与移动次数限制（目前还没有考虑特殊卡片的情况）
 	//目前也没有区分属于玩家的卡和属于怪兽的卡，虽然不影响效果
 
-    public void recoverCardState() {
+	public void recoverCardState() {
 
 		for (int i = 0; i < board.activeUnits.size(); i++) {
 			board.activeUnits.get(i).setAttackNum(1);
@@ -127,8 +116,8 @@ public class GameState {
 
 		}
 
-    }
-    //这是为了ai方法准备的
+	}
+	//这是为了ai方法准备的
 	public void aiMethod() {
 
 
@@ -138,4 +127,5 @@ public class GameState {
 
 
 	}
+	
 }

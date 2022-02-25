@@ -77,6 +77,7 @@ public class Player {
 	public void getHandCard() {
 		if(minFreePosition==numOfHandCard) {
 			deck.getCard();		//if hand is full, discard the card got from deck
+			return;
 		}
 		
 		hand[minFreePosition] = deck.getCard();
@@ -121,6 +122,10 @@ public class Player {
 	
 	public void setMana(int mana) {
 		this.mana = mana;
+	}
+	
+	public void setAvatar(Avatar avatar) {
+		this.avatar = avatar;
 	}
 	
 	public void costMana(int cost) {

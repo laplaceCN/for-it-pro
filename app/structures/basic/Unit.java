@@ -25,8 +25,7 @@ public class Unit {
 	Position position;
 	UnitAnimationSet animations;
 	ImageCorrection correction;
-	private int attackNum;
-	private int moveNum;
+
 	public int getAttackNum() {
 		return attackNum;
 	}
@@ -42,6 +41,9 @@ public class Unit {
 	public void setMoveNum(int moveNum) {
 		this.moveNum = moveNum;
 	}
+
+	private int attackNum;
+	private int moveNum;
 	
 	public Unit() {}
 	

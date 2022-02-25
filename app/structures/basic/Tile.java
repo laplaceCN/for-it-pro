@@ -28,6 +28,9 @@ public class Tile {
 	int tilex;
 	int tiley;
 	
+	int ownership = -1; //unoccupied: -1; by human: 0; by ai: 1
+	//public boolean highlighted = false;
+	
 	public Tile() {}
 	
 	public Tile(String tileTexture, int xpos, int ypos, int width, int height, int tilex, int tiley) {
@@ -95,6 +98,10 @@ public class Tile {
 		this.tiley = tiley;
 	}
 	
+	public int getOwnership() {
+		return this.ownership;
+	}
+	
 	/**
 	 * Loads a tile from a configuration file
 	 * parameters.
@@ -123,6 +130,10 @@ public class Tile {
 		} else {
 			return false;
 		}
+	}
+
+	public void setOwnership(int i) {
+		this.ownership = i;
 	}
 	
 	

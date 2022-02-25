@@ -14,6 +14,7 @@ public class Avatar extends Unit{
 	
 	public void changeHealth(int change) {
 		player.changeHealth(change);
+		if(player.getHealth()>20) {player.setHealth(20);;}
 		//if(player.isDead){}
 	}
 }

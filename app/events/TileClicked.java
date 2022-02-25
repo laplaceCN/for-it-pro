@@ -29,7 +29,7 @@ public class TileClicked implements EventProcessor{
 
 		int tilex = message.get("tilex").asInt();
 		int tiley = message.get("tiley").asInt();
-		
+
 		if (gameState.cardClickedAndWaiting == true) {
 			gameState.cardClickedAndWaiting = false;
 			//stop showing available tiles
@@ -65,7 +65,14 @@ public class TileClicked implements EventProcessor{
 
 
 		}
+//			try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
+			gameState.getHumanModel().highlightControl(out, 0);
+			
+			
+			//use the card
+			gameState.getHumanModel().useSelectedCard(out, gameState.tempCardIndex, tilex, tiley);
+		}
 		
 	}
 
-}
+

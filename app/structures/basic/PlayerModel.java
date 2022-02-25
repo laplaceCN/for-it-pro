@@ -7,15 +7,31 @@ import commands.BasicCommands;
 
 public class PlayerModel {
 	
-	private Player player;
-	private Board board;
-	public ArrayList<Tile> availableTiles;
+	private static int humanID = 100;
+	private static int aiID = 101;
 	
+	private Board board;
+	
+	private Player player;
+	public Avatar avatar;
+	
+	public ArrayList<Tile> availableTiles;	//all the available tiles under normal circumstance
+	public ArrayList<Tile> freeSummon;		//all the unoccupied tiles, which are available for free-summon cards
+	public ArrayList<Tile> allowedTiles;	//the working set of tiles which can be used
 	
 	public PlayerModel(Player p, Board b) {
 		this.player = p;
 		this.board = b;
 		this.availableTiles = new ArrayList<Tile>();
+		this.allowedTiles = new ArrayList<Tile>();
+		if(!player.humanOrAI) {
+			this.avatar = (Avatar)utils.BasicObjectBuilders.loadUnit(utils.StaticConfFiles.humanAvatar, humanID, Avatar.class);
+		} else {
+			this.avatar = (Avatar)utils.BasicObjectBuilders.loadUnit(utils.StaticConfFiles.humanAvatar, aiID, Avatar.class);
+		}
+		
+		this.avatar.setPlayer(player);
+		this.player.setAvatar(avatar);
 	}
 
 	public void initHand(ActorRef out) {
@@ -37,15 +53,33 @@ public class PlayerModel {
 	public void showAvailables(ActorRef out, int index, int mode) {
 		Card c = player.getCard(index-1);
 		if(c instanceof UnitCard) {
-			for(Tile t : this.availableTiles) {
-				BasicCommands.drawTile(out, t, mode);
+			if(((UnitCard) c).searchAbility("free_summon")) {
+				freeSummon = new ArrayList<Tile>();
+				for(int i = 0; i < 9; i++) {
+					for(int j = 0; j < 5; j++) {
+						Tile t = board.getTile(i, j);
+						if(t.getOwnership() == -1) {freeSummon.add(t);}
+					}
+				}
+				allowedTiles = freeSummon;
+			} else {
+				allowedTiles = availableTiles;
 			}
+			
+			highlightControl(out, 1);
+			
 		} else if(c instanceof SpellCard) {
 			//restore the highlights
-			for(Tile t : this.availableTiles) {
-				BasicCommands.drawTile(out, t, 0);
-			}
+			highlightControl(out, 0);
 		}
+	}
+	
+	public void highlightControl(ActorRef out, int mode) {
+		for(Tile t : this.availableTiles) {
+			BasicCommands.drawTile(out, t, mode);
+			try {Thread.sleep(20);} catch (InterruptedException e) {e.printStackTrace();}
+		}
+		try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
 	}
 	
 	public void updateAvailables() {
@@ -54,7 +88,7 @@ public class PlayerModel {
 			int tileY = u.getPosition().tiley;
 			int indicator = player.humanOrAI?1:0;
 			//update availableTiles
-			if(u.id/10==indicator || u.id==20+indicator) {
+			if(u.id/Deck.capacity==indicator || u.id==100+indicator) {
 				for(int i = Math.max(tileX-1, 0); i <= Math.min(tileX+1, 8); i++) {
 					for(int j = Math.max(tileY-1, 0); j <= Math.min(tileY+1, 5); j++) {
 						Tile tempTile = board.getTile(i, j);
@@ -77,10 +111,21 @@ public class PlayerModel {
 		return player.getCard(i);
 	}
 
+	//draw avatar
 	public void setAndDrawAvatar(ActorRef out, int i, int j) {
+		
+		BasicCommands.addPlayer1Notification(out, ""+avatar.id, 2);;
 		Tile target = board.getTile(i, j);
+		target.setOwnership(player.humanOrAI?1:0);
 		player.avatar.setPositionByTile(target);
 		BasicCommands.drawUnit(out, player.avatar, target);
+		
+		try {Thread.sleep(500);} catch (InterruptedException e) {e.printStackTrace();}
+		BasicCommands.setUnitAttack(out, avatar, 2);
+		BasicCommands.setUnitHealth(out, avatar, 20);
+		
+		board.addUnit(avatar);
+		
 		this.updateAvailables();
 	}
 
@@ -114,7 +159,7 @@ public class PlayerModel {
 		} else if(c instanceof SpellCard) {
 			return true;
 		}
-		
+
 		return false;
 	}
 
