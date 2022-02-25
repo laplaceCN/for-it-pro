@@ -129,38 +129,40 @@ public class PlayerModel {
 		this.updateAvailables();
 	}
 
-	public boolean useSelectedCard(ActorRef out, int index, int tilex, int tiley) {
+	public void useSelectedCard(ActorRef out, int index, int tilex, int tiley) {
 		Card c = player.getCard(index-1);
-		BasicCommands.addPlayer1Notification(out, ""+player.minFreePosition, 4);
-
+		//for test//BasicCommands.addPlayer1Notification(out, ""+player.minFreePosition, 4);
+		
 		if(c instanceof UnitCard) {
 			Tile target = board.getTile(tilex, tiley);
-			if(availableTiles.contains(target)) {
+			if(allowedTiles.contains(target)) {
 				UnitCard uC = (UnitCard)c;
 				Minion m = (Minion)utils.BasicObjectBuilders.loadUnit(player.unitInfo[c.id%10], c.id, Minion.class);
 				board.addUnit(m);
+				m.setInitHealth(uC.getHealth());
 				m.setHealth(uC.getHealth());
 				m.setAttack(uC.getAttack());
 				m.setPositionByTile(target);
+				target.setOwnership(player.humanOrAI?1:0);
 				BasicCommands.drawUnit(out, m, target);
 				try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
 				BasicCommands.setUnitHealth(out, m, m.getHealth());
 				BasicCommands.setUnitAttack(out, m, m.getAttack());
-				player.costMana(c.manacost);
-				BasicCommands.setPlayer1Mana(out, player);
-				this.updateAvailables();
-				return true;
 			} else {
 				BasicCommands.drawTile(out, target, 2);
 				try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
 				BasicCommands.drawTile(out, target, 0);
-				return false;
+				BasicCommands.drawCard(out, c, index, 0);
+				return;
 			}
 		} else if(c instanceof SpellCard) {
-			return true;
-		}
 
-		return false;
+		}
+		
+		player.costMana(c.manacost);
+		BasicCommands.setPlayer1Mana(out, player);
+		this.updateAvailables();
+		this.deleteHandCard(out, index);
 	}
 
 	public void deleteHandCard(ActorRef out, int tempCardIndex) {

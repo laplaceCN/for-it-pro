@@ -30,17 +30,6 @@ public class OtherClicked implements EventProcessor{
 			int previousIndex = gameState.tempCardIndex;
 			//let the buffer rest
 			try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
-//			for(int i = 0; i < 9; i++) {
-//				for(int j = 0; j < 5; j++) {
-//					if(gameState.getBoard().getTile(i, j).highlighted) {
-//						Tile t = gameState.getBoard().getTile(i, j);
-//						BasicCommands.drawTile(out, t, 0);
-//						try {Thread.sleep(20);} catch (InterruptedException e) {e.printStackTrace();}
-//						//t.highlighted = false;
-//					}
-//				}
-//			}
-//			try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
 			gameState.getHumanModel().highlightControl(out, 0);
 			
 			BasicCommands.drawCard(out, hModel.getCard(previousIndex-1), previousIndex, 0);
