@@ -31,6 +31,7 @@ public class GameState {
 	public int tempCardIndex;
 	public Unit tempUnit;
 
+
 	// the Board
 	private Board board;
 	// the players
@@ -127,5 +128,17 @@ public class GameState {
 
 
 	}
-	
+
+	public void move() {
+	}
+
+
+
+	public boolean checkAttackUnit() {
+		return false;
+	}
+
+	public boolean checkMoveUnit() {
+		return false;
+	}
 }

@@ -45,24 +45,40 @@ public class TileClicked implements EventProcessor{
 		if(gameState.tileClickedAndWaiting == true){
 			//重置状态
 			gameState.tileClickedAndWaiting = false;
-			//显示攻击范围，在下面的方法的基础上需要改写
-			gameState.getHumanModel().showAvailables(out, gameState.tempCardIndex, 0);
+
 
 			//判断点击的对象是否超了范围
 			boolean flag = gameState.getHumanModel().useSelectedCard(out, gameState.tempCardIndex, tilex, tiley);
 
 			if(flag){
-				gameState.Attack();
+				boolean move = gameState.checkMoveUnit();
+				boolean attack = gameState.checkAttackUnit();
+				if(move == true){
+				gameState.move();
+				}else if(attack == true) {
+				gameState.Attack();}
+				else {
+					BasicCommands.addPlayer1Notification(out,"please click the your card again",2);
+				}
 			}
 
 
 
 
 		}
-		if(gameState.tileClickedAndWaiting == false && gameState.cardClickedAndWaiting == true){
-
-
-
+		if(gameState.tileClickedAndWaiting == false && gameState.cardClickedAndWaiting == false){
+			for (int i = 0; i < gameState.getBoard().activeUnits.size(); i++) {
+				if((gameState.getBoard().activeUnits.get(i).getPosition().getTilex() == tilex)&&
+						(gameState.getBoard().activeUnits.get(i).getPosition().getTiley() == tiley)){
+					gameState.tempUnit = gameState.getBoard().activeUnits.get(i);
+					gameState.tileClickedAndWaiting = true;
+					//显示攻击或者移动范围，下列方法没有考虑特殊unit
+					try {Thread.sleep(500);} catch (InterruptedException e) {e.printStackTrace();}
+					gameState.getBoardModel().showAvailables(out,tilex,tiley, 1);
+					try {Thread.sleep(500);} catch (InterruptedException e) {e.printStackTrace();}
+					BasicCommands.addPlayer1Notification(out,"you are clicking the unit",2);
+				}
+			}
 
 		}
 //			try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
