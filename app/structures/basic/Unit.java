@@ -61,6 +61,10 @@ public class Unit {
 	
 	//above methods are saved for implement polymorphism in subclasses
 	
+	//limits for attack and move;
+	//normally, they should be 1; if it is azurite_lion or serpenti, set it to 2
+	private int attackNum = 1;
+	private int moveNum = 1;
 
 	public int getAttackNum() {
 		return attackNum;
@@ -77,9 +81,6 @@ public class Unit {
 	public void setMoveNum(int moveNum) {
 		this.moveNum = moveNum;
 	}
-
-	private int attackNum;
-	private int moveNum;
 	
 	public Unit() {}
 	

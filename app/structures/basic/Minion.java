@@ -7,7 +7,6 @@ public class Minion extends Unit{
 	public int id;
 	private int health;
 	
-	private int attackLimit = 1;
 	private boolean provoke = false;
 	private int startingHealth;
 	
@@ -28,12 +27,6 @@ public class Minion extends Unit{
 		return this.health;
 	}
 	//end of overrides
-	
-	//set maximum attack times, usually 1;
-	//if it is azurite_lion or serpenti, set it to 2
-	public void setAttackLimit(int i) {
-		this.attackLimit = i;
-	}
 	
 	//about provoke ability
 	public void enableProvoke() {

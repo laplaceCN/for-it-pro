@@ -158,8 +158,10 @@ public class PlayerModel {
 				//write information to the newly created minion object
 				m.setHealth(uC.getHealth());
 				m.setAttack(uC.getAttack());
-				if(uC.searchAbility("twice_attack")) {m.setAttackLimit(2);}
-				else {m.setAttackLimit(1);}
+				if(uC.searchAbility("twice_attack")) {
+					m.setAttackNum(2);
+					m.setMoveNum(2);
+				}
 				//record the position
 				m.setPositionByTile(target);	
 				BasicCommands.drawUnit(out, m, target);
