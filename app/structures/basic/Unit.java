@@ -3,6 +3,8 @@ package structures.basic;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import javax.sql.DataSource;
+
 /**
  * This is a representation of a Unit on the game board.
  * A unit has a unique id (this is used by the front-end.
@@ -15,7 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Dr. Richard McCreadie
  *
  */
-public class Unit {
+public class Unit implements Comparable{
 
 	@JsonIgnore
 	protected static ObjectMapper mapper = new ObjectMapper(); // Jackson Java Object Serializer, is used to read java objects from a file
@@ -25,6 +27,8 @@ public class Unit {
 	Position position;
 	UnitAnimationSet animations;
 	ImageCorrection correction;
+
+
 
 	public int getAttackNum() {
 		return attackNum;
@@ -125,6 +129,15 @@ public class Unit {
 	public void setPositionByTile(Tile tile) {
 		position = new Position(tile.getXpos(),tile.getYpos(),tile.getTilex(),tile.getTiley());
 	}
-	
-	
+	@Override
+	public int compareTo(Object otherObject)
+	{
+		Unit unit = (Unit) otherObject;
+		if ((id - unit.id) < 0) return -1;
+		if ((id - unit.id) > 0) return 1;
+		return 0;
+	}
+
+
+
 }

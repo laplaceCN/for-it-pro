@@ -25,8 +25,15 @@ public class UnitMoving implements EventProcessor{
 		
 		int unitid = message.get("id").asInt();
 
-		BasicCommands.addPlayer1Notification(out,"this " +unitid+ " card is moving",2);
+		if ((unitid < 100)) {
+			BasicCommands.addPlayer1Notification(out,"this " +unitid+ " card is moving",2);
+		}else {
+			BasicCommands.addPlayer1Notification(out,"this avatar is moving",2);
+		}
+
 
 	}
+
+
 
 }

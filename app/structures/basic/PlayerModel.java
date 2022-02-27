@@ -83,6 +83,7 @@ public class PlayerModel {
 	}
 	
 	public void updateAvailables() {
+		availableTiles.clear();
 		for(Unit u : board.activeUnits) {
 			int tileX = u.getPosition().tilex;
 			int tileY = u.getPosition().tiley;
