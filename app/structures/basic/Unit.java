@@ -15,6 +15,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Dr. Richard McCreadie
  *
  */
+
+/* extended by minion and avatar; compared to the basic Unit, added attack and some methods, 
+ * some of the methods are written to be override by its sub classes*/
 public class Unit {
 
 	@JsonIgnore
@@ -25,6 +28,58 @@ public class Unit {
 	Position position;
 	UnitAnimationSet animations;
 	ImageCorrection correction;
+	
+	//attack is shared by both avatar and minion,
+	//while health is independent in minion but residents in avatar's player attribute
+	protected int attack;
+	
+	//getters and setters for attack
+	public void setAttack(int a) {
+		this.attack = a;
+	}
+	
+	public void changeAttack(int a) {
+		this.attack += a;
+	}
+	
+	public int getAttack() {
+		return this.attack;
+	}
+	
+	//to be override
+	public void setHealth(int h) {
+		
+	}
+	
+	public void changeHealth(int h) {
+		
+	}
+	
+	public int getHealth() {
+		return 0;
+	}
+	
+	//above methods are saved for implement polymorphism in subclasses
+	
+
+	public int getAttackNum() {
+		return attackNum;
+	}
+
+	public void setAttackNum(int attackNum) {
+		this.attackNum = attackNum;
+	}
+
+	public int getMoveNum() {
+		return moveNum;
+	}
+
+	public void setMoveNum(int moveNum) {
+		this.moveNum = moveNum;
+	}
+
+	private int attackNum;
+	private int moveNum;
 	
 	public Unit() {}
 	

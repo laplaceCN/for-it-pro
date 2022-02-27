@@ -30,10 +30,33 @@ public class OtherClicked implements EventProcessor{
 			int previousIndex = gameState.tempCardIndex;
 			//let the buffer rest
 			try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
+//			for(int i = 0; i < 9; i++) {
+//				for(int j = 0; j < 5; j++) {
+//					if(gameState.getBoard().getTile(i, j).highlighted) {
+//						Tile t = gameState.getBoard().getTile(i, j);
+//						BasicCommands.drawTile(out, t, 0);
+//						try {Thread.sleep(20);} catch (InterruptedException e) {e.printStackTrace();}
+//						//t.highlighted = false;
+//					}
+//				}
+//			}
+//			try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
 			gameState.getHumanModel().highlightControl(out, 0);
 			
 			BasicCommands.drawCard(out, hModel.getCard(previousIndex-1), previousIndex, 0);
 			//gameState.tempCardIndex = -1;
+
+
+
+		}
+		//重置tile点击缓存
+		if(gameState.tileClickedAndWaiting){
+			gameState.tileClickedAndWaiting = false;
+			//因为目前点击桌面上的卡还是会闪烁地显示移动与攻击范围所以不需要更改tile的mod值了，
+			//而tempunit没被用来判断真假，所以不需要重置，之后覆盖就行
+
+
+
 		}
 		
 	}

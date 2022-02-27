@@ -1,5 +1,8 @@
 package structures.basic;
 
+/* represents a player's avatar on board
+ * the health value is always synchronised with the player
+ * a sub class of Unit*/
 public class Avatar extends Unit{
 	
 	static int initAttack = 2;
@@ -12,9 +15,22 @@ public class Avatar extends Unit{
 		p.avatar = this;
 	}
 	
-	public void changeHealth(int change) {
-		player.changeHealth(change);
-		if(player.getHealth()>20) {player.setHealth(20);;}
-		//if(player.isDead){}
+	//override Unit's methods about health
+	@Override
+	public void setHealth(int h) {
+		player.health = h;
 	}
+	
+	@Override
+	public void changeHealth(int h) {
+		player.health += h;
+		if(player.health > 20) {this.setHealth(20);}
+	}
+	
+	@Override
+	public int getHealth() {
+		return player.health;
+	}
+	//end of overrides
+	
 }

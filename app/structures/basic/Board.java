@@ -11,7 +11,9 @@ public class Board {
 		tiles = new Tile[9][5];
 		for(int i = 0; i < 9; i++) {
 			for(int j = 0; j < 5; j++) {
+
 				tiles[i][j] = utils.BasicObjectBuilders.loadTile(i, j);
+
 			}
 		}
 		activeUnits = new ArrayList<Unit>();

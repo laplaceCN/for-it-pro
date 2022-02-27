@@ -7,6 +7,10 @@ import akka.actor.ActorRef;
 import commands.BasicCommands;
 import utils.StaticConfFiles;
 
+/* represents the deck of each player, 
+ * contains two set of card generating information, 
+ * active depends on the player is human or AI
+ * deck generating from the blueprint in the constructor. */
 public class Deck {
 	
 	public static int capacity = 20;
