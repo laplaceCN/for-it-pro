@@ -38,8 +38,9 @@ public class BoardModel {
 					BasicCommands.drawTile(out,tile,mode);
 					try {Thread.sleep(20);} catch (InterruptedException e) {e.printStackTrace();}
 				}
-				try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
+
 			}
+			try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
 		}
 	}
 
