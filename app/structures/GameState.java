@@ -318,10 +318,7 @@ public class GameState {
 	}
 	//只考虑了range
 	public boolean checkMoveLocation(ActorRef out,int x,int y) {
-		System.out.println(tempUnit.getId());
 		if(tempUnit.getMoveNum() == 0 || tempUnit.getAttackNum() == 0){
-			System.out.println(tempUnit.getAttackNum());
-			System.out.println(tempUnit.getMoveNum());
 			return false;
 		}
 		if(tempUnit.getId() == 18 || tempUnit.getId() == 8){//判断是否有飞行功能

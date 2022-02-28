@@ -84,7 +84,7 @@ public class PlayerModel {
 	//the switch highlight of the allowed tiles to put card
 	//called in showAvailables and EventResponders like otherClicked
 	public void highlightControl(ActorRef out, int mode) {
-		for(Tile t : this.availableTiles) {
+		for(Tile t : this.allowedTiles) {
 			BasicCommands.drawTile(out, t, mode);
 			try {Thread.sleep(20);} catch (InterruptedException e) {e.printStackTrace();}
 		}
@@ -151,7 +151,9 @@ public class PlayerModel {
 
 		if(c instanceof UnitCard) {
 			Tile target = board.getTile(tilex, tiley);
-			if(availableTiles.contains(target)) {
+			//test the allowedTiles' size
+			System.out.println(c.id + "" + allowedTiles.size());
+			if(allowedTiles.contains(target)) {
 				UnitCard uC = (UnitCard)c;
 				Minion m = (Minion)utils.BasicObjectBuilders.loadUnit(player.unitInfo[c.id%10], c.id, Minion.class);
 				board.addUnit(m);
@@ -159,7 +161,7 @@ public class PlayerModel {
 				m.setHealth(uC.getHealth());
 				m.setAttack(uC.getAttack());
 				if(uC.searchAbility("twice_attack")) {
-					m.setAttackNum(2);
+					m.setAttackNum(0);//unit cannot launch attack in their first turn
 					m.setMoveNum(2);
 				}
 				//record the position

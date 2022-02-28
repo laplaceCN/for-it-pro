@@ -34,12 +34,13 @@ public class TileClicked implements EventProcessor{
 			gameState.cardClickedAndWaiting = false;
 			//stop showing available tiles
 			gameState.getHumanModel().showAvailables(out, gameState.tempCardIndex, 0);
-			//use the card
+			//use the card, boolean flag shows whether a card is successfully used
 			boolean flag = gameState.getHumanModel().useSelectedCard(out, gameState.tempCardIndex, tilex, tiley);
-			//在这里让函数返回一个布尔值的目的是为了判断放置卡牌是否成功。如果没有成功则不删除卡牌。
-
+			//turn off the highlight
+			gameState.getHumanModel().highlightControl(out, 0);
 			//remove card from hand
-			if(flag == true) {gameState.getHumanModel().deleteHandCard(out, gameState.tempCardIndex);}
+			if(flag) {gameState.getHumanModel().deleteHandCard(out, gameState.tempCardIndex);}
+			
 		}
 
 		if(gameState.tileClickedAndWaiting == true){
