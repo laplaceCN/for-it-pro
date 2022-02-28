@@ -3,8 +3,6 @@ package structures.basic;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.sql.DataSource;
-
 /**
  * This is a representation of a Unit on the game board.
  * A unit has a unique id (this is used by the front-end.
@@ -17,7 +15,10 @@ import javax.sql.DataSource;
  * @author Dr. Richard McCreadie
  *
  */
-public class Unit implements Comparable{
+
+/* extended by minion and avatar; compared to the basic Unit, added attack and some methods, 
+ * some of the methods are written to be override by its sub classes*/
+public class Unit {
 
 	@JsonIgnore
 	protected static ObjectMapper mapper = new ObjectMapper(); // Jackson Java Object Serializer, is used to read java objects from a file
@@ -27,8 +28,43 @@ public class Unit implements Comparable{
 	Position position;
 	UnitAnimationSet animations;
 	ImageCorrection correction;
-
-
+	
+	//attack is shared by both avatar and minion,
+	//while health is independent in minion but residents in avatar's player attribute
+	protected int attack;
+	
+	//getters and setters for attack
+	public void setAttack(int a) {
+		this.attack = a;
+	}
+	
+	public void changeAttack(int a) {
+		this.attack += a;
+	}
+	
+	public int getAttack() {
+		return this.attack;
+	}
+	
+	//to be override
+	public void setHealth(int h) {
+		
+	}
+	
+	public void changeHealth(int h) {
+		
+	}
+	
+	public int getHealth() {
+		return 0;
+	}
+	
+	//above methods are saved for implement polymorphism in subclasses
+	
+	//limits for attack and move;
+	//normally, they should be 1; if it is azurite_lion or serpenti, set it to 2
+	private int attackNum = 1;
+	private int moveNum = 1;
 
 	public int getAttackNum() {
 		return attackNum;
@@ -45,9 +81,6 @@ public class Unit implements Comparable{
 	public void setMoveNum(int moveNum) {
 		this.moveNum = moveNum;
 	}
-
-	private int attackNum;
-	private int moveNum;
 	
 	public Unit() {}
 	
@@ -129,15 +162,6 @@ public class Unit implements Comparable{
 	public void setPositionByTile(Tile tile) {
 		position = new Position(tile.getXpos(),tile.getYpos(),tile.getTilex(),tile.getTiley());
 	}
-	@Override
-	public int compareTo(Object otherObject)
-	{
-		Unit unit = (Unit) otherObject;
-		if ((id - unit.id) < 0) return -1;
-		if ((id - unit.id) > 0) return 1;
-		return 0;
-	}
-
-
-
+	
+	
 }

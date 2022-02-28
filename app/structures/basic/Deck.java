@@ -7,6 +7,10 @@ import akka.actor.ActorRef;
 import commands.BasicCommands;
 import utils.StaticConfFiles;
 
+/* represents the deck of each player, 
+ * contains two set of card generating information, 
+ * active depends on the player is human or AI
+ * deck generating from the blueprint in the constructor. */
 public class Deck {
 	
 	public static int capacity = 20;
@@ -73,7 +77,7 @@ public class Deck {
 		abilityInfo.get("ranged").add(25);abilityInfo.get("ranged").add(35);
 		
 		abilityInfo.put("flying", new ArrayList<Integer>());
-		abilityInfo.get("flying").add(8);abilityInfo.get("flying").add(18);
+		abilityInfo.get("flying").add(28);abilityInfo.get("flying").add(38);
 		
 		abilityInfo.put("twice_attack", new ArrayList<Integer>());
 		abilityInfo.get("twice_attack").add(4);abilityInfo.get("twice_attack").add(14);

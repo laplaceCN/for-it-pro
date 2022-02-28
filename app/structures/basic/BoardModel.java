@@ -44,6 +44,48 @@ public class BoardModel {
 		}
 	}
 
+	//清空场上的显示
+	public void offAvailables(ActorRef out, int mode) {
+		//显示移动与攻击范围
 
+		for(int i = 0; i < 9; i++) {
+			for(int j = 0; j < 5; j++) {
+				Tile tile = board.getTile(i,j);
+
+				BasicCommands.drawTile(out,tile,mode);
+				try {Thread.sleep(10);} catch (InterruptedException e) {e.printStackTrace();}
+
+			}
+			try {Thread.sleep(50);} catch (InterruptedException e) {e.printStackTrace();}
+		}
+	}
+
+
+	
+	public void showStatisticsAndCountRound(ActorRef out, GameState gameState) {
+		//set mana and count round number
+		human.setMana(gameState.numRound+1);
+		ai.setMana(gameState.numRound+1);
+		//show them
+		BasicCommands.setPlayer1Health(out, human);
+		BasicCommands.setPlayer2Health(out, ai);
+		BasicCommands.setPlayer1Mana(out, human);
+		BasicCommands.setPlayer2Mana(out, ai);
+		//let the buffer rest
+		try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
+		//and count round
+		gameState.numRound++;
+	}
+	
+	public void setHumanMana(ActorRef out, GameState gameState) {
+		human.setMana(gameState.numRound + 1);
+		BasicCommands.setPlayer1Mana(out, human);
+		gameState.numRound++;
+	}
+	public void setAiMana(ActorRef out, GameState gameState) {
+		ai.setMana(gameState.numRound + 1);
+		BasicCommands.setPlayer2Mana(out, ai);
+
+	}
 
 }

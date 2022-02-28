@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import akka.actor.ActorRef;
 import commands.BasicCommands;
 
+/* containing all the methods related to single player 
+ * such as draw card, use card, etc. */
 public class PlayerModel {
 	
 	private static int humanID = 100;
@@ -15,6 +17,8 @@ public class PlayerModel {
 	private Player player;
 	public Avatar avatar;
 	
+	//storing the allowed tiles to put card;
+	//among those three availableTiles is maintained throughout the game (always updating)
 	public ArrayList<Tile> availableTiles;	//all the available tiles under normal circumstance
 	public ArrayList<Tile> freeSummon;		//all the unoccupied tiles, which are available for free-summon cards
 	public ArrayList<Tile> allowedTiles;	//the working set of tiles which can be used
@@ -34,6 +38,7 @@ public class PlayerModel {
 		this.player.setAvatar(avatar);
 	}
 
+	//initialise the cards in hand, i.e. obtain 3 cards from deck
 	public void initHand(ActorRef out) {
 		for(int i = 0; i < Player.numOfInitHand; i++) {
 			player.getHandCard();
@@ -41,7 +46,7 @@ public class PlayerModel {
 		}
 	}
 	
-	//get a card from deck
+	//get a card from deck, considering the position in hand to insert the card
 	public void drawOneCard(ActorRef out) {
 		int index = player.minFreePosition;
 		player.getHandCard();
@@ -50,6 +55,7 @@ public class PlayerModel {
 		}
 	}
 	
+	//show the available tiles on board for the card on the index^th position in hand
 	public void showAvailables(ActorRef out, int index, int mode) {
 		Card c = player.getCard(index-1);
 		if(c instanceof UnitCard) {
@@ -65,15 +71,18 @@ public class PlayerModel {
 			} else {
 				allowedTiles = availableTiles;
 			}
-			
+			//turn on the highlight
 			highlightControl(out, 1);
 			
 		} else if(c instanceof SpellCard) {
-			//restore the highlights
+			//turn off the highlight
 			highlightControl(out, 0);
+			//specific method to be added
 		}
 	}
 	
+	//the switch highlight of the allowed tiles to put card
+	//called in showAvailables and EventResponders like otherClicked
 	public void highlightControl(ActorRef out, int mode) {
 		for(Tile t : this.availableTiles) {
 			BasicCommands.drawTile(out, t, mode);
@@ -82,8 +91,13 @@ public class PlayerModel {
 		try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
 	}
 	
+	//update allowed tiles to put unit cards (in common cases, not apply for free_summon cards)
+	//this should be called every time after change the position of units (including add or remove unit)
 	public void updateAvailables() {
-		availableTiles.clear();
+		
+		//firstly, clear available tiles, to prepare for populate with the updated information
+		availableTiles.clear(); 
+		//count the units around the units owned by the player
 		for(Unit u : board.activeUnits) {
 			int tileX = u.getPosition().tilex;
 			int tileY = u.getPosition().tiley;
@@ -91,14 +105,14 @@ public class PlayerModel {
 			//update availableTiles
 			if(u.id/Deck.capacity==indicator || u.id==100+indicator) {
 				for(int i = Math.max(tileX-1, 0); i <= Math.min(tileX+1, 8); i++) {
-					for(int j = Math.max(tileY-1, 0); j <= Math.min(tileY+1, 5); j++) {
+					for(int j = Math.max(tileY-1, 0); j <= Math.min(tileY+1, 4); j++) {
 						Tile tempTile = board.getTile(i, j);
 						if(!availableTiles.contains(tempTile)){availableTiles.add(tempTile);}
 					}
 				}
 			}
 		}
-		//remove the units occupied
+		//and then remove the units has been occupied
 		for(Unit u : board.activeUnits) {
 			int tileX = u.getPosition().tilex;
 			int tileY = u.getPosition().tiley;
@@ -107,7 +121,7 @@ public class PlayerModel {
 		}
 	}
 	
-	//get a card from hand
+	//(getter) get a card from hand
 	public Card getCard(int i) {
 		return player.getCard(i);
 	}
@@ -130,6 +144,7 @@ public class PlayerModel {
 		this.updateAvailables();
 	}
 
+	//use the previously selected card, index indicates the previously selected card
 	public boolean useSelectedCard(ActorRef out, int index, int tilex, int tiley) {
 		Card c = player.getCard(index-1);
 		BasicCommands.addPlayer1Notification(out, ""+player.minFreePosition, 4);
@@ -140,9 +155,15 @@ public class PlayerModel {
 				UnitCard uC = (UnitCard)c;
 				Minion m = (Minion)utils.BasicObjectBuilders.loadUnit(player.unitInfo[c.id%10], c.id, Minion.class);
 				board.addUnit(m);
+				//write information to the newly created minion object
 				m.setHealth(uC.getHealth());
 				m.setAttack(uC.getAttack());
-				m.setPositionByTile(target);
+				if(uC.searchAbility("twice_attack")) {
+					m.setAttackNum(2);
+					m.setMoveNum(2);
+				}
+				//record the position
+				m.setPositionByTile(target);	
 				BasicCommands.drawUnit(out, m, target);
 				try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
 				BasicCommands.setUnitHealth(out, m, m.getHealth());
@@ -164,6 +185,7 @@ public class PlayerModel {
 		return false;
 	}
 
+	//delete a hand card, called when the card is used
 	public void deleteHandCard(ActorRef out, int tempCardIndex) {
 		player.deleteHandCard(tempCardIndex-1);
 		BasicCommands.deleteCard(out, tempCardIndex);

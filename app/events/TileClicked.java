@@ -42,7 +42,9 @@ public class TileClicked implements EventProcessor{
 			if(flag == true) {gameState.getHumanModel().deleteHandCard(out, gameState.tempCardIndex);}
 		}
 
-		if(gameState.tileClickedAndWaiting == true){
+		else if(gameState.tileClickedAndWaiting == true){
+			gameState.getBoardModel().offAvailables(out, 0);
+			
 			//重置状态
 			gameState.tileClickedAndWaiting = false;
 			gameState.getHumanModel().highlightControl(out, 0);
@@ -56,7 +58,7 @@ public class TileClicked implements EventProcessor{
 				move = gameState.checkMoveLocation(out,tilex,tiley);
 				if(move){
 					//调用移动方法
-				gameState.move(out,tilex,tiley);
+					gameState.move(out,tilex,tiley);
 
 				}
 			}else if(attack) {
@@ -73,7 +75,7 @@ public class TileClicked implements EventProcessor{
 
 
 		}
-		if(gameState.tileClickedAndWaiting == false && gameState.cardClickedAndWaiting == false){
+		else if(gameState.tileClickedAndWaiting == false && gameState.cardClickedAndWaiting == false){
 			for (int i = 0; i < gameState.getBoard().activeUnits.size(); i++) {
 				if((gameState.getBoard().activeUnits.get(i).getPosition().getTilex() == tilex)&&
 						(gameState.getBoard().activeUnits.get(i).getPosition().getTiley() == tiley)){
@@ -81,10 +83,12 @@ public class TileClicked implements EventProcessor{
 					gameState.tileClickedAndWaiting = true;
 					//显示攻击或者移动范围，下列方法没有考虑特殊unit
 					try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
+					gameState.speshowAvailables(out);
+
 					gameState.getBoardModel().showAvailables(out,tilex,tiley, 1);
 					try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
 					BasicCommands.addPlayer1Notification(out,"you are clicking the unit",2);
-					gameState.getBoardModel().showAvailables(out,tilex,tiley, 0);
+
 				}
 			}
 

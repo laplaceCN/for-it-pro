@@ -3,6 +3,7 @@ package structures;
 import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.basic.*;
+import utils.StaticConfFiles;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -61,30 +62,12 @@ public class GameState {
 		boardModel = new BoardModel(human, ai, board);
 	}
 	
-	public void showStatisticsAndCountRound(ActorRef out) {
-		//set mana and count round number
-		human.setMana(numRound+1);
-		ai.setMana(numRound+1);
-		//show them
-		BasicCommands.setPlayer1Health(out, human);
-		BasicCommands.setPlayer2Health(out, ai);
-		BasicCommands.setPlayer1Mana(out, human);
-		BasicCommands.setPlayer2Mana(out, ai);
-		//let the buffer rest
-		try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
-		//and count round
-		numRound++;
-	}
 
 	public void clearHumanMana(ActorRef out) {
 		human.setMana(0);
 		BasicCommands.setPlayer1Mana(out, human);
-	}
-	public void setHumanMana(ActorRef out) {
-		human.setMana(numRound + 2);
-		BasicCommands.setPlayer1Mana(out, human);
-	}
 
+	}
 
 	//getters
 	public Board getBoard() {
@@ -124,7 +107,6 @@ public class GameState {
 			if(board.activeUnits.get(i).getId() == 4||board.activeUnits.get(i).getId() == 27||
 					board.activeUnits.get(i).getId() == 14||board.activeUnits.get(i).getId() == 37){
 				board.activeUnits.get(i).setAttackNum(2);
-				board.activeUnits.get(i).setMoveNum(2);
 			}
 		}
 
@@ -144,6 +126,12 @@ public class GameState {
 //		}
 //		if(playerUnitNumber > 3 || aiUnitNumber < 3){
 //			//判断有没有合适的魔法卡
+
+//			ai:deckInfo[0] = StaticConfFiles.c_staff_of_ykir;				//+2 attack -> avatar
+//			deckInfo[1] = StaticConfFiles.c_entropic_decay;				//=0 health -> a non avatar unit
+//			human:deckInfo[0] = StaticConfFiles.c_truestrike;				//-2 health -> an enemy unit
+//			deckInfo[1] = StaticConfFiles.c_sundrop_elixir;			//+5 health -> a unit (result<=init)
+
 //			// 召唤在avatar的后面保存实力
 //		}else if(playerUnitNumber <3 ){
 //			//判断有没有合适的魔法卡
@@ -211,75 +199,66 @@ public class GameState {
 		for (int i = 0; i < board.activeUnits.size(); i++) {
 			if ((board.activeUnits.get(i).getPosition().getTilex() == x) &&
 					(board.activeUnits.get(i).getPosition().getTiley() == y)) {
-				Unit united = board.activeUnits.get(i);
-				Unit tempUniting = this.tempUnit;
-				if(united instanceof Avatar) {//被攻击者属于玩家
-					if (tempUniting instanceof Minion) {//攻击者属于怪兽
-						Avatar avatared = (Avatar) united;// 被攻击者名称后面加了ed
-						Minion minioning = (Minion) tempUniting;// 攻击者名称后面加了ing
-
-						int attackUnitHealth = minioning.getHealth();
-
-						int attackedUnitHealth = ai.getHealth();
-						//被攻击者血量
-						avatared.changeHealth(attackedUnitHealth -= minioning.getAttack());
-						//若被攻击后被攻击者生命值大于0
-						if (attackedUnitHealth >= 0) {
-							//进行反击
-							minioning.setHealth(attackUnitHealth -= avatared.getAttackNum());
-							if (attackUnitHealth >= 0) {//若攻击者的生命值大于等于0
-								BasicCommands.setUnitHealth(out, minioning, attackUnitHealth);
-								BasicCommands.setUnitHealth(out, avatared, attackedUnitHealth);
-							} else {//攻击者的生命值小于0的情况
-
-
-							}
-						} else {//被攻击者受到攻击之后生命值小于0的情况，删除卡牌，出发结束游戏
-
-
-						}
-					}
-					//攻击者也属于玩家类
-					else {
-
-
-					}
+				Unit attacked = board.activeUnits.get(i);  //创建被攻击者
+				Unit attacker = this.tempUnit;     //创建攻击者
+				if (attacked instanceof Avatar) {
+					attacked = (Avatar) attacked;
+				} //被攻击者类型改成Avartar 或者Minion
+				else {
+					attacked = (Minion) attacked;
 				}
 
-//				else if (unit instanceof Minion ){
-//					Minion minion = (Minion)unit;
-//
-//					Unit tempUnit = this.tempUnit;
-//
-//					int attackUnitHealth = tempUnit.getHealth();
-//
-//					int attackedUnitHealth = unit.getHealth();
-//					//被攻击者血量
-//					unit.setHealth(attackedUnitHealth -= tempUnit.getAttack());
-//					//若被攻击后生命值大于0
-//					if (attackedUnitHealth >= 0) {
-//						//进行反击
-//						tempUnit.setHealth(attackUnitHealth -= unit.getAttack());
-//						if (attackUnitHealth >= 0) {
-//							BasicCommands.setUnitHealth(out, tempUnit, attackUnitHealth);
-//							BasicCommands.setUnitHealth(out, tempUnit, attackedUnitHealth);
-//						} else {
-//						}
-//					}
-//
-//
-//				}
+				if (attacker instanceof Avatar) {
+					attacker = (Avatar) attacked;
+				} //攻击者类型改成Avartar 或者Minion
+				else {
+					attacker = (Minion) attacker;
+				}
+
+				UnitAnimationSet attackerAnimations = new UnitAnimationSet(); //设置动画
+				attackerAnimations.getAttack();
+				attacker.setAnimations(attackerAnimations);
+
+				int attackValue;
+				if (attacked.getHealth() <= attacker.getAttack()) {  //被攻击者血量小于攻击值
+					attackValue = attacked.getHealth();
+					//从activeUnit里面的移除死掉的被攻击者
+					board.activeUnits.remove(attacked);
+					//修改availableTiles
+					humanModel.availableTiles.add(board.getTile(attacked.getPosition().getTilex(), attacked.getPosition().getTiley()));
+					//在前端删掉相关的卡牌
+					BasicCommands.deleteUnit(out, attacked);
+					BasicCommands.addPlayer1Notification(out, "the" + attacked.getId() + "has been killed", 2);
+
+				} else {   //被攻击者血量大于攻击值
+					attackValue = attacker.getAttack();
+					//被攻击者的血量改变
+					attacked.changeHealth(attackValue);
+					int attackedHealth = attacked.getHealth();
+					BasicCommands.setUnitHealth(out, attacked, attackedHealth);
+					//被攻击者开始反击
+					attackValue = attacked.getAttack();
 
 
-
+					if (attacker.getHealth() <= attackValue) {   //攻击者被反击死亡
+						//从activeUnit里面的移除死掉的攻击者
+						board.activeUnits.remove(attacker);
+						//修改availableTiles
+						humanModel.availableTiles.add(board.getTile(attacker.getPosition().getTilex(), attacker.getPosition().getTiley()));
+						//在前端删掉相关的卡牌
+						BasicCommands.deleteUnit(out, attacker);
+						BasicCommands.addPlayer1Notification(out, "the" + attacker.getId() + "has been killed", 2);
+						if (attacker instanceof Avatar) {
+							//游戏结束
+						}
+					} else {
+						attacker.changeHealth(attackValue);
+						int attackerHealth = attacker.getHealth();
+						BasicCommands.setUnitHealth(out, attacker, attackerHealth);
+					}
+				}
 			}
-
 		}
-
-
-
-
-
 	}
 	//这是为了移动方法准备的
 	public void move(ActorRef out,int x, int y) {
@@ -337,10 +316,13 @@ public class GameState {
 	}
 	//只考虑了range
 	public boolean checkMoveLocation(ActorRef out,int x,int y) {
+		System.out.println(tempUnit.getId());
 		if(tempUnit.getMoveNum() == 0 || tempUnit.getAttackNum() == 0){
+			System.out.println(tempUnit.getAttackNum());
+			System.out.println(tempUnit.getMoveNum());
 			return false;
 		}
-		if(tempUnit.getId() == 18 || tempUnit.getId() == 8){//判断是否有飞行功能
+		if(tempUnit.getId() == 28 || tempUnit.getId() == 38){//判断是否有飞行功能
 			//判断移动的位置是否已经有己方unit，因为攻击方法里只判断了是否存在属于ai的unit
 			for (int i = 0; i < board.activeUnits.size(); i++) {
 				if ((board.activeUnits.get(i).getPosition().getTilex() == x)
@@ -363,8 +345,8 @@ public class GameState {
 					return false;
 				}
 			}
-
-		return true;}
+			return true;
+		}
 		return false;
 	}
 	//只考虑了特殊攻击范围的卡
@@ -374,38 +356,59 @@ public class GameState {
 			return false;
 
 		}
-
-		if(tempUnit.getId() == 5 || tempUnit.getId() == 15||tempUnit.getId() == 25 || tempUnit.getId() == 35){
+		//嘲讽技能
+		if(tempUnit.getId()%10 == 5 ){
 			ArrayList<Unit> temp = new ArrayList<>();//每个玩家卡范围内的敌人列表
 
 			for (int i = 0; i < board.activeUnits.size(); i++) {
-				if((board.activeUnits.get(i).getId()%20 == 1)||
-						board.activeUnits.get(i).getId() == 101){
-				//在攻击范围内的敌人列表
-				if (Math.abs(board.activeUnits.get(i).getPosition().getTilex()
-						- x)+Math.abs(board.activeUnits.get(i).getPosition().getTiley()
-						- y) < 3){
-					temp.add(board.activeUnits.get(i));
+				if((board.activeUnits.get(i).getId()%20 == 1)){
+				//在攻击范围内的敌人列表 针对普通攻击范围的卡
+					if (Math.abs(board.activeUnits.get(i).getPosition().getTilex()
+							- x)+Math.abs(board.activeUnits.get(i).getPosition().getTiley()
+							- y) < 3){
+						temp.add(board.activeUnits.get(i));
 
-				}
-					for (int j = 0; j < temp.size(); j++) {
-						if(temp.get(j).getId() == 7 || temp.get(j).getId() == 9 || temp.get(j).getId() == 26||
-						temp.get(j).getId() == 17 || temp.get(j).getId() == 19 || temp.get(j).getId() == 36){
-							if(temp.get(j).getPosition().getTilex() == x && temp.get(j).getPosition().getTiley() == y){
-								return true;
-							}
-							return false;
-
-
+					}
+					//针对特殊攻击范围的卡加列表
+					else if(tempUnit.getId()%10 == 5 ){
+						temp.add(board.activeUnits.get(i));
+					}
+					//嘲讽 首先查询攻击范围内有没有嘲讽技能的敌人，再判断目标是不是
+					for (Unit unit : temp) {
+						if (unit.getId() == 7 || unit.getId() == 9 || unit.getId() == 26 ||
+								unit.getId() == 17 || unit.getId() == 19 || unit.getId() == 36) {
+							return unit.getPosition().getTilex() == x && unit.getPosition().getTiley() == y;
 						}
 					}
 				}
 			}
-			return true;
+			return false;
 		}
-		if((Math.abs((tempUnit.getPosition().getTilex() - x))+Math.abs((tempUnit.getPosition().getTiley() - y))<3)){
-			return true;}
-		return false;
+		return Math.abs((tempUnit.getPosition().getTilex() - x)) + Math.abs((tempUnit.getPosition().getTiley() - y)) < 3;
 	}
 
+	public void clearAiMana(ActorRef out) {
+		ai.setMana(0);
+		BasicCommands.setPlayer2Mana(out, ai);
+
+	}
+
+	public void speshowAvailables(ActorRef out) {
+		if(tempUnit.getId() == 5 || tempUnit.getId() == 15 ||
+				tempUnit.getId() == 25 || tempUnit.getId() == 35
+				|| tempUnit.getId() == 28 || tempUnit.getId() == 38){
+			getBoardModel().offAvailables(out, 1);
+		}
+	}
+
+	public void perTurnSkill() {
+		for (int i = 0; i < board.activeUnits.size(); i++) {
+			if (board.activeUnits.get(i).getId() == 4 || board.activeUnits.get(i).getId() == 14
+			||board.activeUnits.get(i).getId() == 27 || board.activeUnits.get(i).getId() == 37) {
+				int oldAttack = board.activeUnits.get(i).getAttack();
+				board.activeUnits.get(i).setAttack(oldAttack*2);
+			}
+		}
+
+	}
 }
