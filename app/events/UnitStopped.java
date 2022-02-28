@@ -27,10 +27,18 @@ public class UnitStopped implements EventProcessor{
 		int unitid = message.get("id").asInt();
 
 
-		BasicCommands.addPlayer1Notification(out,"this " +unitid+ " card stop moving",2);
+		if ((unitid < 100)) {
 
 
-		
+
+			BasicCommands.addPlayer1Notification(out,"this " +unitid+ " card is stoping",2);
+		}else {
+			BasicCommands.addPlayer1Notification(out,"this avatar is stoping",2);
+		}
+
+
+
+
 	}
 
 }

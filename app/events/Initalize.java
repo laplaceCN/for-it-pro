@@ -47,7 +47,7 @@ public class Initalize implements EventProcessor{
 		try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
 		
 		//show mana and health
-		gameState.showStatisticsAndCountRound(out);
+		gameState.getBoardModel().showStatisticsAndCountRound(out, gameState);
 		
 		// User 1 makes a change
 		//CommandDemo.executeDemo(out); // this executes the command demo, comment out this when implementing your solution

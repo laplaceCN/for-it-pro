@@ -45,12 +45,9 @@ public class EndTurnClicked implements EventProcessor{
 			//gameState.tempCardIndex = -1;
 		}
 
-		gameState.aiMethod();
+//		gameState.aiMethod();
 
-		gameState.setHumanMana(out);
-
-
-
+		gameState.getBoardModel().setHumanMana(out, gameState);
 
 	}
 	/**

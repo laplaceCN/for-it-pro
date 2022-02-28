@@ -14,7 +14,8 @@ public class Ability {
 	}
 	
 	public static void attackTwice(Minion m) {
-		m.setAttackLimit(2);
+		m.setAttackNum(2);
+		m.setMoveNum(2);
 	}
 	
 	public static void provoke(Minion m) {

@@ -43,7 +43,25 @@ public class BoardModel {
 			try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
 		}
 	}
-
-
+	
+	public void showStatisticsAndCountRound(ActorRef out, GameState gameState) {
+		//set mana and count round number
+		human.setMana(gameState.numRound+1);
+		ai.setMana(gameState.numRound+1);
+		//show them
+		BasicCommands.setPlayer1Health(out, human);
+		BasicCommands.setPlayer2Health(out, ai);
+		BasicCommands.setPlayer1Mana(out, human);
+		BasicCommands.setPlayer2Mana(out, ai);
+		//let the buffer rest
+		try {Thread.sleep(1000);} catch (InterruptedException e) {e.printStackTrace();}
+		//and count round
+		gameState.numRound++;
+	}
+	
+	public void setHumanMana(ActorRef out, GameState gameState) {
+		human.setMana(gameState.numRound + 2);
+		BasicCommands.setPlayer1Mana(out, human);
+	}
 
 }
