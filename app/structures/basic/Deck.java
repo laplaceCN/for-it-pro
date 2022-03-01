@@ -84,6 +84,7 @@ public class Deck {
 		abilityInfo.get("twice_attack").add(27);abilityInfo.get("twice_attack").add(37);
 
 		abilityInfo.put("free_summon", new ArrayList<Integer>());
+		abilityInfo.get("free_summon").add(2);//test
 		abilityInfo.get("free_summon").add(7);abilityInfo.get("free_summon").add(17);
 		abilityInfo.get("free_summon").add(24);abilityInfo.get("free_summon").add(34);
 				

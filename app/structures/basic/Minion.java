@@ -9,7 +9,8 @@ public class Minion extends Unit{
 	
 	private boolean provoke = false;
 	private int startingHealth;
-	
+
+
 	//override Unit's methods about health
 	@Override
 	public void setHealth(int h) {
@@ -19,6 +20,7 @@ public class Minion extends Unit{
 	@Override
 	public void changeHealth(int h) {
 		this.health += h;
+		System.out.println(startingHealth+"hhhhh");
 		if(this.health > startingHealth) {this.setHealth(startingHealth);}
 	}
 	

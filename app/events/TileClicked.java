@@ -30,19 +30,20 @@ public class TileClicked implements EventProcessor{
 		int tilex = message.get("tilex").asInt();
 		int tiley = message.get("tiley").asInt();
 
-		if (gameState.cardClickedAndWaiting == true) {
+		if (gameState.cardClickedAndWaiting) {
 			gameState.cardClickedAndWaiting = false;
 			//stop showing available tiles
 			gameState.getHumanModel().showAvailables(out, gameState.tempCardIndex, 0);
 			//use the card
 			boolean flag = gameState.getHumanModel().useSelectedCard(out, gameState.tempCardIndex, tilex, tiley);
 			//在这里让函数返回一个布尔值的目的是为了判断放置卡牌是否成功。如果没有成功则不删除卡牌。
+			gameState.getHumanModel().highlightControl(out,0);
 
 			//remove card from hand
-			if(flag == true) {gameState.getHumanModel().deleteHandCard(out, gameState.tempCardIndex);}
+			if(flag) {gameState.getHumanModel().deleteHandCard(out, gameState.tempCardIndex);}
 		}
 
-		else if(gameState.tileClickedAndWaiting == true){
+		else if(gameState.tileClickedAndWaiting){
 			gameState.getBoardModel().offAvailables(out, 0);
 			
 			//重置状态
@@ -75,19 +76,30 @@ public class TileClicked implements EventProcessor{
 
 
 		}
-		else if(gameState.tileClickedAndWaiting == false && gameState.cardClickedAndWaiting == false){
+		else if(!gameState.tileClickedAndWaiting && !gameState.cardClickedAndWaiting){
 			for (int i = 0; i < gameState.getBoard().activeUnits.size(); i++) {
 				if((gameState.getBoard().activeUnits.get(i).getPosition().getTilex() == tilex)&&
 						(gameState.getBoard().activeUnits.get(i).getPosition().getTiley() == tiley)){
 					gameState.tempUnit = gameState.getBoard().activeUnits.get(i);
 					gameState.tileClickedAndWaiting = true;
-					//显示攻击或者移动范围，下列方法没有考虑特殊unit
-					try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
-					gameState.speshowAvailables(out);
 
-					gameState.getBoardModel().showAvailables(out,tilex,tiley, 1);
-					try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
-					BasicCommands.addPlayer1Notification(out,"you are clicking the unit",2);
+					//显示攻击或者移动范围
+					if(gameState.tempUnit.getId() < 20 || gameState.tempUnit.getId() ==100) {
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						gameState.speshowAvailables(out);
+
+						gameState.getBoardModel().showAvailables(out, tilex, tiley, 1);
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						BasicCommands.addPlayer1Notification(out, "you are clicking the unit", 2);
+					}
 
 				}
 			}

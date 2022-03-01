@@ -195,71 +195,81 @@ public class GameState {
 //
 //	}
 	//这是为了攻击方法准备的
-	public void Attack(ActorRef out,int x,int y) {
-		for (int i = 0; i < board.activeUnits.size(); i++) {
-			if ((board.activeUnits.get(i).getPosition().getTilex() == x) &&
-					(board.activeUnits.get(i).getPosition().getTiley() == y)) {
-				Unit attacked = board.activeUnits.get(i);  //创建被攻击者
-				Unit attacker = this.tempUnit;     //创建攻击者
-				if (attacked instanceof Avatar) {
-					attacked = (Avatar) attacked;
-				} //被攻击者类型改成Avartar 或者Minion
-				else {
-					attacked = (Minion) attacked;
-				}
+public void Attack(ActorRef out,int x,int y) {
+	for (int i = 0; i < board.activeUnits.size(); i++) {
+		if ((board.activeUnits.get(i).getPosition().getTilex() == x) &&
+				(board.activeUnits.get(i).getPosition().getTiley() == y)) {
+			//攻击者攻击次数-1
+			this.tempUnit.setAttackNum(this.tempUnit.getAttackNum()-1);
+			Unit attacked = board.activeUnits.get(i);  //创建被攻击者
+			Unit attacker = this.tempUnit;     //创建攻击者
+			if (attacked instanceof Avatar) {
+				attacked = (Avatar) attacked;
+			} //被攻击者类型改成Avartar 或者Minion
+			else {
+				attacked = (Minion) attacked;
+			}
 
-				if (attacker instanceof Avatar) {
-					attacker = (Avatar) attacked;
-				} //攻击者类型改成Avartar 或者Minion
-				else {
-					attacker = (Minion) attacker;
-				}
+			if (attacker instanceof Avatar) {
+				attacker = (Avatar) attacked;
+			} //攻击者类型改成Avartar 或者Minion
+			else {
+				attacker = (Minion) attacker;
+			}
 
-				UnitAnimationSet attackerAnimations = new UnitAnimationSet(); //设置动画
-				attackerAnimations.getAttack();
-				attacker.setAnimations(attackerAnimations);
+//				UnitAnimationSet attackerAnimations = new UnitAnimationSet(); //设置动画
+//				attackerAnimations.getAttack();
+//				attacker.setAnimations(attackerAnimations);
 
-				int attackValue;
-				if (attacked.getHealth() <= attacker.getAttack()) {  //被攻击者血量小于攻击值
-					attackValue = attacked.getHealth();
-					//从activeUnit里面的移除死掉的被攻击者
-					board.activeUnits.remove(attacked);
+			int attackValue;
+			if (attacked.getHealth() <= attacker.getAttack()) {  //被攻击者血量小于攻击值
+//					attackValue = attacked.getHealth();
+				//从activeUnit里面的移除死掉的被攻击者
+				board.activeUnits.remove(attacked);
+				//修改availableTiles
+				humanModel.availableTiles.add(board.getTile(attacked.getPosition().getTilex(), attacked.getPosition().getTiley()));
+				//在前端删掉相关的卡牌
+				BasicCommands.deleteUnit(out, attacked);
+				BasicCommands.addPlayer1Notification(out, "the" + attacked.getId() + "has been killed", 2);
+			} else {   //被攻击者血量大于攻击值
+
+				attackValue = attacker.getAttack();
+
+				//被攻击者的血量改变
+				attacked.changeHealth(-attackValue);
+
+				int attackedHealth = attacked.getHealth();
+
+				BasicCommands.setUnitHealth(out, attacked, attackedHealth);
+				//被攻击者开始反击
+
+				attackValue = attacked.getAttack();
+
+
+				if (attacker.getHealth() <= attackValue) {   //攻击者被反击死亡
+					//从activeUnit里面的移除死掉的攻击者
+					board.activeUnits.remove(attacker);
 					//修改availableTiles
-					humanModel.availableTiles.add(board.getTile(attacked.getPosition().getTilex(), attacked.getPosition().getTiley()));
+					humanModel.availableTiles.add(board.getTile(attacker.getPosition().getTilex(), attacker.getPosition().getTiley()));
 					//在前端删掉相关的卡牌
-					BasicCommands.deleteUnit(out, attacked);
-					BasicCommands.addPlayer1Notification(out, "the" + attacked.getId() + "has been killed", 2);
-
-				} else {   //被攻击者血量大于攻击值
-					attackValue = attacker.getAttack();
-					//被攻击者的血量改变
-					attacked.changeHealth(attackValue);
-					int attackedHealth = attacked.getHealth();
-					BasicCommands.setUnitHealth(out, attacked, attackedHealth);
-					//被攻击者开始反击
-					attackValue = attacked.getAttack();
-
-
-					if (attacker.getHealth() <= attackValue) {   //攻击者被反击死亡
-						//从activeUnit里面的移除死掉的攻击者
-						board.activeUnits.remove(attacker);
-						//修改availableTiles
-						humanModel.availableTiles.add(board.getTile(attacker.getPosition().getTilex(), attacker.getPosition().getTiley()));
-						//在前端删掉相关的卡牌
-						BasicCommands.deleteUnit(out, attacker);
-						BasicCommands.addPlayer1Notification(out, "the" + attacker.getId() + "has been killed", 2);
-						if (attacker instanceof Avatar) {
-							//游戏结束
-						}
-					} else {
-						attacker.changeHealth(attackValue);
-						int attackerHealth = attacker.getHealth();
-						BasicCommands.setUnitHealth(out, attacker, attackerHealth);
+					BasicCommands.deleteUnit(out, attacker);
+					BasicCommands.addPlayer1Notification(out, "the" + attacker.getId() + "has been killed", 2);
+					if (attacker instanceof Avatar) {
+						//游戏结束
 					}
+
+				}else {
+
+					attacker.changeHealth(-attackValue);
+
+					int attackerHealth = attacker.getHealth();
+					BasicCommands.setUnitHealth(out, attacker, attackerHealth);
+
 				}
 			}
 		}
 	}
+}
 	//这是为了移动方法准备的
 	public void move(ActorRef out,int x, int y) {
 		//知道要移动哪张卡
@@ -270,11 +280,45 @@ public class GameState {
 			getHumanModel().updateAvailables();
 			return;
 		}
-		//还要知道移动到哪里
 		Tile tile = board.getTile(x, y);
+		//还要知道移动到哪里
+		boolean flag = true;//要不要进y轴查询
 
-		BasicCommands.moveUnitToTile(out,tempUnit,tile);
-		try {Thread.sleep(200);} catch (InterruptedException e) {e.printStackTrace();}
+		if(tempUnit.getPosition().getTilex() != x && tempUnit.getPosition().getTiley() != y){
+			//查询横向有没有存在的单位
+			for (int i = tempUnit.getPosition().getTilex();
+				 i <= tempUnit.getPosition().getTilex()+Math.abs(tempUnit.getPosition().getTilex() -x) ; i++) {
+
+				if(board.getTile(i,tempUnit.getPosition().getTiley()).getOwnership() > -1){
+					BasicCommands.moveUnitToTile(out,tempUnit,tile,true);
+					flag = false;
+					break;
+				}
+			}
+			//上面的不存在就继续查询纵向有没有存在的单位
+			System.out.println(flag);
+			if (flag) {
+				for (int j = tempUnit.getPosition().getTiley();
+					 j <= tempUnit.getPosition().getTiley()+ Math.abs(tempUnit.getPosition().getTiley() -y); j++) {
+					if (board.getTile(x, j).getOwnership() > -1) {
+						BasicCommands.moveUnitToTile(out, tempUnit, tile, true);
+						break;
+					}
+				}
+				BasicCommands.moveUnitToTile(out,tempUnit,tile);
+				try {Thread.sleep(200);} catch (InterruptedException e) {e.printStackTrace();}
+			}
+
+		}else {
+			BasicCommands.moveUnitToTile(out, tempUnit, tile);
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+
 		tempUnit.setMoveNum(tempUnit.getMoveNum() -1);
 		board.getTile(x,y).setOwnership(0);
 		int previousX = tempUnit.getPosition().getTilex();
@@ -317,6 +361,7 @@ public class GameState {
 	//只考虑了range
 	public boolean checkMoveLocation(ActorRef out,int x,int y) {
 		System.out.println(tempUnit.getId());
+		//不能多次移动或者攻击后移动
 		if(tempUnit.getMoveNum() == 0 || tempUnit.getAttackNum() == 0){
 			System.out.println(tempUnit.getAttackNum());
 			System.out.println(tempUnit.getMoveNum());
