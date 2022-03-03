@@ -1,5 +1,7 @@
 package structures.basic;
 
+import java.util.ArrayList;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -31,7 +33,7 @@ public class Unit {
 	
 	//attack is shared by both avatar and minion,
 	//while health is independent in minion but residents in avatar's player attribute
-	protected int attack;
+	protected int attack = 0;
 	
 	//getters and setters for attack
 	public void setAttack(int a) {
@@ -39,7 +41,10 @@ public class Unit {
 	}
 	
 	public void changeAttack(int a) {
-		this.attack += a;
+		System.out.println("attack before change" + attack);
+		int x = attack + a;
+		attack = x;
+		System.out.println("attack has been changed" + attack);
 	}
 	
 	public int getAttack() {
@@ -72,6 +77,10 @@ public class Unit {
 
 	public void setAttackNum(int attackNum) {
 		this.attackNum = attackNum;
+	}
+	
+	public void decAttackNum() {
+		this.attackNum -= 2;
 	}
 
 	public int getMoveNum() {
@@ -140,6 +149,14 @@ public class Unit {
 	public Position getPosition() {
 		return position;
 	}
+	
+	public int getX() {
+		return position.getTilex();
+	}
+	
+	public int getY() {
+		return position.getTiley();
+	}
 
 	public void setPosition(Position position) {
 		this.position = position;
@@ -163,5 +180,24 @@ public class Unit {
 		position = new Position(tile.getXpos(),tile.getYpos(),tile.getTilex(),tile.getTiley());
 	}
 	
+	public boolean belongToAI() {
+		if(id / Deck.capacity == 1 || id == 101) {
+			return true;
+		}
+		return false;
+	}
 	
+	//evaluate whether two unit are neighbours
+	public boolean isNeighbour(Unit u) {
+		if(this.position.near(u.getPosition())) {
+			return true;
+		} else {return false;}
+	}
+	
+	//helper to change position of the unit
+	public void changePosition(int x, int y) {
+		int x0 = position.getTilex(), y0 = position.getTiley();
+		this.position.setTilex(x0+x);
+		this.position.setTiley(y0+y);
+	}
 }

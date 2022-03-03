@@ -22,7 +22,11 @@ public class Heartbeat implements EventProcessor{
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
-		
+		gameState.heartbeatNum++;
+		if(gameState.heartbeatNum == 8) {
+			gameState.heartbeatNum = 0;
+			try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+		}
 	}
 
 }

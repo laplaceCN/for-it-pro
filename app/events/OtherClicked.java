@@ -57,7 +57,12 @@ public class OtherClicked implements EventProcessor{
 
 
 
+
 		}
+
+		gameState.getBoardModel().offAvailables(out, 0);
+
+
 		
 	}
 

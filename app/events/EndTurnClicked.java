@@ -29,6 +29,7 @@ public class EndTurnClicked implements EventProcessor{
 		gameState.clearHumanMana(out);
 
 		gameState.recoverCardState();
+		gameState.perTurnSkill();
 
 
 		//清楚暂存器状态
@@ -45,9 +46,13 @@ public class EndTurnClicked implements EventProcessor{
 			//gameState.tempCardIndex = -1;
 		}
 
-//		gameState.aiMethod();
+		gameState.autoControl.autoPlay();
+		gameState.getAIModel().drawOneCard(out);
+		gameState.clearAiMana(out);
 
-		gameState.getBoardModel().setHumanMana(out, gameState);
+//		gameState.getBoardModel().setHumanMana(out, gameState);
+//		gameState.getBoardModel().setAiMana(out, gameState);
+		gameState.getBoardModel().showStatisticsAndCountRound(out, gameState);
 
 	}
 	/**

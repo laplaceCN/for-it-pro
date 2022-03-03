@@ -9,7 +9,11 @@ public class Minion extends Unit{
 	
 	private boolean provoke = false;
 	private int startingHealth;
-	
+	private boolean ranged = false;
+	private boolean passive_1 = false;
+	private boolean passive_2 = false;
+
+
 	//override Unit's methods about health
 	@Override
 	public void setHealth(int h) {
@@ -19,7 +23,9 @@ public class Minion extends Unit{
 	@Override
 	public void changeHealth(int h) {
 		this.health += h;
-		if(this.health > startingHealth) {this.setHealth(startingHealth);}
+		System.out.println(startingHealth+"hhhhh");
+		if(this.health > startingHealth) {this.health = this.startingHealth;}
+		if(this.health < 0) {this.health = 0;}
 	}
 	
 	@Override
@@ -33,10 +39,39 @@ public class Minion extends Unit{
 		this.provoke = true;
 	}
 	
+	//about ranged ability
+	public void enableRanged() {
+		this.ranged = true;
+	}
+	
+	//about passive abilities
+	public void enableP1() {
+		this.passive_1 = true;
+	}
+	
+	public void enableP2() {
+		this.passive_2 = true;
+	}
+	
 	public void setInitHealth(int h) {
 		this.startingHealth = h;
 	}
 	
 	//getters are placed upper in this class or in the super class
 	
+	public boolean getProvoke() {
+		return this.provoke;
+	}
+	
+	public boolean getRanged() {
+		return this.ranged;
+	}
+	
+	public boolean getP1() {
+		return this.passive_1;
+	}
+	
+	public boolean getP2() {
+		return this.passive_2;
+	}
 }

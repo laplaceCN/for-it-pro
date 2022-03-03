@@ -8,8 +8,7 @@ public class Avatar extends Unit{
 	static int initAttack = 2;
 
 	Player player;
-	private int attack = initAttack;
-	
+
 	public void setPlayer(Player p) {
 		player = p;
 		p.avatar = this;
@@ -19,6 +18,7 @@ public class Avatar extends Unit{
 	@Override
 	public void setHealth(int h) {
 		player.health = h;
+		if(player.health > 20) {this.setHealth(20);}
 	}
 	
 	@Override

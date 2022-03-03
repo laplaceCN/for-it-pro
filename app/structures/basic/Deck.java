@@ -57,6 +57,14 @@ public class Deck {
 		if(toBeDrawn == Deck.capacity) {return null;}
 		return deck[toBeDrawn++];
 	}
+
+	public int getToBeDrawn() {
+		return toBeDrawn;
+	}
+
+	public void setToBeDrawn(int toBeDrawn) {
+		this.toBeDrawn = toBeDrawn;
+	}
 	
 	private void loadInfo(boolean isAI) {
 		//decide which set of information needs to be loaded according to who is the player
@@ -77,13 +85,14 @@ public class Deck {
 		abilityInfo.get("ranged").add(25);abilityInfo.get("ranged").add(35);
 		
 		abilityInfo.put("flying", new ArrayList<Integer>());
-		abilityInfo.get("flying").add(8);abilityInfo.get("flying").add(18);
+		abilityInfo.get("flying").add(28);abilityInfo.get("flying").add(38);
 		
 		abilityInfo.put("twice_attack", new ArrayList<Integer>());
 		abilityInfo.get("twice_attack").add(4);abilityInfo.get("twice_attack").add(14);
 		abilityInfo.get("twice_attack").add(27);abilityInfo.get("twice_attack").add(37);
 
 		abilityInfo.put("free_summon", new ArrayList<Integer>());
+
 		abilityInfo.get("free_summon").add(7);abilityInfo.get("free_summon").add(17);
 		abilityInfo.get("free_summon").add(24);abilityInfo.get("free_summon").add(34);
 				
