@@ -1,5 +1,8 @@
 package structures.basic;
 
+import commands.BasicCommands;
+import structures.GameState;
+
 import java.util.ArrayList;
 
 public class Board {
@@ -26,4 +29,11 @@ public class Board {
 	public Tile getTile(int i, int j) {
 		return tiles[i][j];
 	}
+
+
+
+
+
+
+
 }

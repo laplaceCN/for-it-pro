@@ -30,12 +30,14 @@ public class Avatar extends Unit{
 	public void setHealth(int h) {
 		player.health = h;
 		if(player.health > 20) {this.setHealth(20);}
+		if(player.health < 0) {this.setHealth(0);}
 	}
 	
 	@Override
 	public void changeHealth(int h) {
 		player.health += h;
 		if(player.health > 20) {this.setHealth(20);}
+		if(player.health < 0) {this.setHealth(0);}
 	}
 	
 	@Override

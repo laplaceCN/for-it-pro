@@ -17,6 +17,9 @@ import structures.GameState;
  * 
  * @author Dr. Richard McCreadie
  *
+ * The main purpose of this class is to indicate to the player that a particular card is starting to move
+ *	The action of this class is to send a text prompt to the player
+ * @author Ether group
  */
 public class UnitMoving implements EventProcessor{
 

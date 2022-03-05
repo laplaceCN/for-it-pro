@@ -9,19 +9,54 @@ public class Minion extends Unit{
 	
 	private boolean provoke = false;
 	private int startingHealth;
+	private boolean ranged = false;
+	private boolean passive_1 = false;
+	private boolean passive_2 = false;
+
+	public void enableRanged() {
+		this.ranged = true;
+	}
+
+	//about passive abilities
+	public void enableP1() {
+		this.passive_1 = true;
+	}
+
+	public void enableP2() {
+		this.passive_2 = true;
+	}
+
+	public boolean getProvoke() {
+		return this.provoke;
+	}
+
+	public boolean getRanged() {
+		return this.ranged;
+	}
+
+	public boolean getP1() {
+		return this.passive_1;
+	}
+
+	public boolean getP2() {
+		return this.passive_2;
+	}
 
 
 	//override Unit's methods about health
 	@Override
 	public void setHealth(int h) {
 		this.health = h;
+
+		if(this.health < 0) {this.health = 0;}
 	}
 	
 	@Override
 	public void changeHealth(int h) {
 		this.health += h;
-		System.out.println(startingHealth+"hhhhh");
+
 		if(this.health > startingHealth) {this.setHealth(startingHealth);}
+		if(this.health < 0) {this.health = 0;}
 	}
 	
 	@Override

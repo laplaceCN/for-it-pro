@@ -17,11 +17,22 @@ import structures.GameState;
  * 
  * @author Dr. Richard McCreadie
  *
+ * The main purpose of this class is to reduce the possiblity of buffer overloaded
+ * The main action of this class is to wait the action in web when the game is going
+ *
+ * @author Ether group
+ *
  */
 public class Heartbeat implements EventProcessor{
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
+		gameState.heartbeatNum++;
+		if(gameState.heartbeatNum == 8) {
+			gameState.heartbeatNum = 0;
+			try {Thread.sleep(30);} catch (InterruptedException e) {e.printStackTrace();}
+		}
+
 		
 	}
 

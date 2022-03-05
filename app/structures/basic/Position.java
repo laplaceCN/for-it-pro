@@ -49,5 +49,25 @@ public class Position {
 	public void setTiley(int tilexy) {
 		this.tiley = tilexy;
 	}
+
+	public boolean near(Position p) {
+		int xDistance = Math.abs(p.tilex - this.tilex);
+		int yDistance = Math.abs(p.tiley - this.tiley);
+		if(Math.max(xDistance, yDistance) == 1) {return true;}
+		else {return false;}
+	}
+
+	public boolean equals(Object o) {
+		if(o instanceof Position) {
+			Position p = (Position)o;
+			if(p.getTilex() == this.tilex && p.getTiley() == this.tiley) {
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
 		
 }

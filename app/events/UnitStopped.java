@@ -18,6 +18,10 @@ import structures.GameState;
  * 
  * @author Dr. Richard McCreadie
  *
+ * The main purpose of this class is to indicate to the player that a particular card has stopped
+ * 	The action of this class is to send a text prompt to the player
+ * @author Ether group
+ *
  */
 public class UnitStopped implements EventProcessor{
 
@@ -31,9 +35,9 @@ public class UnitStopped implements EventProcessor{
 
 
 
-			BasicCommands.addPlayer1Notification(out,"this " +unitid+ " card is stoping",2);
+			BasicCommands.addPlayer1Notification(out,"this " +unitid+ " card has stopped",2);
 		}else {
-			BasicCommands.addPlayer1Notification(out,"this avatar is stoping",2);
+			BasicCommands.addPlayer1Notification(out,"this avatar has stopped",2);
 		}
 
 

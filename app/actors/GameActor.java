@@ -47,6 +47,7 @@ public class GameActor extends AbstractActor {
 	 * connection to the front-end is established.
 	 * @param out
 	 */
+
 	@SuppressWarnings("deprecation")
 	public GameActor(ActorRef out) {
 
@@ -62,7 +63,7 @@ public class GameActor extends AbstractActor {
 		eventProcessors.put("cardclicked", new CardClicked());
 		eventProcessors.put("endturnclicked", new EndTurnClicked());
 		eventProcessors.put("otherclicked", new OtherClicked());
-		
+
 		// Initalize a new game state object
 		gameState = new GameState();
 		

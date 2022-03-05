@@ -21,6 +21,12 @@ import structures.basic.*;
  * 
  * @author Dr. Richard McCreadie
  *
+ * The main purpose of this class is to handle changes in the game state when the player clicks on a tile
+ * There are three main types of responses in this class:
+ * the player wants to display range of attack or movement,
+ * the player wants to attack or move, and the player wants to summon
+ *
+ *
  */
 public class TileClicked implements EventProcessor{
 
@@ -30,13 +36,15 @@ public class TileClicked implements EventProcessor{
 		int tilex = message.get("tilex").asInt();
 		int tiley = message.get("tiley").asInt();
 
+
+
 		if (gameState.cardClickedAndWaiting) {
 			gameState.cardClickedAndWaiting = false;
 			//stop showing available tiles
 			gameState.getHumanModel().showAvailables(out, gameState.tempCardIndex, 0);
 			//use the card
 			boolean flag = gameState.getHumanModel().useSelectedCard(out, gameState.tempCardIndex, tilex, tiley);
-			//在这里让函数返回一个布尔值的目的是为了判断放置卡牌是否成功。如果没有成功则不删除卡牌。
+			//The return value represents whether the card was successfully placed
 			gameState.getHumanModel().highlightControl(out,0);
 
 			//remove card from hand
@@ -46,28 +54,29 @@ public class TileClicked implements EventProcessor{
 		else if(gameState.tileClickedAndWaiting){
 			gameState.getBoardModel().offAvailables(out, 0);
 			
-			//重置状态
+			//Reset the game temp state
 			gameState.tileClickedAndWaiting = false;
 			gameState.getHumanModel().highlightControl(out, 0);
 
-			//判断这次点击是否是移动
-			boolean move = gameState.checkMoveUnit(tilex,tiley);
-			//判断这次点击是否是攻击（即点击的对方的unit）
-			boolean attack = gameState.checkAttackUnit(tilex,tiley);
+			//Determine if the player wants to move with this click
+			boolean move = gameState.getBoardModel().checkMoveUnit(tilex,tiley);
+			//Determine if the player wants to attack with this click
+			boolean attack = gameState.getBoardModel().checkAttackUnit(tilex,tiley);
 			if(move){
-				//检查移动的位置是否合法
-				move = gameState.checkMoveLocation(out,tilex,tiley);
+				//Determine if the move conforms to the rules
+				move = gameState.getBoardModel().checkMoveLocation(gameState,out,tilex,tiley);
 				if(move){
-					//调用移动方法
-					gameState.move(out,tilex,tiley);
+					//move
+					gameState.getBoardModel().move(gameState,out,tilex,tiley);
 
 				}
 			}else if(attack) {
 				//检查攻击的位置是否合法
-				attack = gameState.checkAttackLocation(tilex,tiley);
+				attack = gameState.getBoardModel().checkAttackLocation(gameState,tilex,tiley);
+
 				if(attack){
-					//调用攻击方法
-			gameState.Attack(out,tilex,tiley);}}
+					//Check that the attack is in compliance with the rules
+			gameState.getBoardModel().Attack(out,tilex,tiley,gameState);}}
 			else {
 				BasicCommands.addPlayer1Notification(out,"please click the your card again",2);
 				try {Thread.sleep(100);} catch (InterruptedException e) {e.printStackTrace();}
@@ -78,19 +87,24 @@ public class TileClicked implements EventProcessor{
 		}
 		else if(!gameState.tileClickedAndWaiting && !gameState.cardClickedAndWaiting){
 			for (int i = 0; i < gameState.getBoard().activeUnits.size(); i++) {
+				//If the click location exists unit
 				if((gameState.getBoard().activeUnits.get(i).getPosition().getTilex() == tilex)&&
 						(gameState.getBoard().activeUnits.get(i).getPosition().getTiley() == tiley)){
 					gameState.tempUnit = gameState.getBoard().activeUnits.get(i);
+					System.out.println(gameState.tempUnit.getAttack()+"hello");
+					System.out.println(gameState.tempUnit.getHealth()+"hello");
+
+
 					gameState.tileClickedAndWaiting = true;
 
-					//显示攻击或者移动范围
+					//Displays range of attack or movement
 					if(gameState.tempUnit.getId() < 20 || gameState.tempUnit.getId() ==100) {
 						try {
 							Thread.sleep(100);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						}
-						gameState.speshowAvailables(out);
+						gameState.getBoardModel().speshowAvailables(gameState,out);
 
 						gameState.getBoardModel().showAvailables(out, tilex, tiley, 1);
 						try {
